@@ -4,7 +4,9 @@ import com.smartparking.backend.dto.ParkingRequest;
 import com.smartparking.backend.dto.ParkingResponse;
 import com.smartparking.backend.model.Parking;
 import com.smartparking.backend.repository.ParkingRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -33,5 +35,10 @@ public class ParkingService {
 
     private ParkingResponse toResponse(Parking p) {
         return new ParkingResponse(p.getId(), p.getName(), p.getAddress(), p.getCapacity());
+    }
+    public ParkingResponse findById(Long id) {
+        return parkingRepository.findById(id)
+                .map(this::toResponse)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Parking introuvable"));
     }
 }
