@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 
 @Service
 public class JwtService {
+
     private final JwtEncoder encoder;
 
     public JwtService(JwtEncoder encoder) {
@@ -23,6 +24,7 @@ public class JwtService {
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .subject(user.getEmail())
+                .claim("role", user.getRole().name())
                 .issuedAt(now)
                 .expiresAt(now.plus(1, ChronoUnit.HOURS))
                 .build();
