@@ -1,5 +1,6 @@
 package com.smartparking.backend.service;
 
+import com.smartparking.backend.dto.AuthResponse;
 import com.smartparking.backend.dto.LoginRequest;
 import com.smartparking.backend.dto.RegisterRequest;
 import com.smartparking.backend.dto.UserResponse;
@@ -12,12 +13,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class AuthService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public UserResponse register(RegisterRequest request) {
@@ -31,11 +37,17 @@ public class AuthService {
         return toResponse(userRepository.save(user));
     }
 
-    public UserResponse login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .filter(u -> passwordEncoder.matches(request.password(), u.getPasswordHash()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Identifiants invalides"));
-        return toResponse(user);
+        return new AuthResponse(jwtService.generate(user), toResponse(user));
+    }
+
+    public UserResponse me(String email) {
+        return userRepository.findByEmail(email)
+                .map(this::toResponse)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Utilisateur introuvable"));
     }
 
     private UserResponse toResponse(User u) {
