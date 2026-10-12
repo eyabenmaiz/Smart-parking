@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: smartparking
+          POSTGRES_USER: smartparking
+          POSTGRES_PASSWORD: smartparking
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U smartparking -d smartparking"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Tests et build Maven
+        working-directory: backend
+        run: mvn -B -ntp verify
+
+      - name: Construire l'image Docker
+        run: docker build -t smartparking-backend:ci ./backend
