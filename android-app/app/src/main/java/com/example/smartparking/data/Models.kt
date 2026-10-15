@@ -7,3 +7,10 @@ data class RegisterRequest(val name: String, val email: String, val password: St
 data class UserResponse(val id: Long, val name: String, val email: String)
 
 data class AuthResponse(val token: String, val user: UserResponse)
+data class ParkingResponse(
+    val id: Long,
+    val name: String,
+    val address: String,
+    val capacity: Int,
+    val availableSpots: Int
+)

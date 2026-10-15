@@ -1,15 +1,15 @@
 package com.example.smartparking.userinterface
 
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.smartparking.data.ApiClient
 import com.example.smartparking.data.LoginRequest
 import com.example.smartparking.data.TokenStore
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 
 class LoginViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -23,13 +23,19 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
     fun login(email: String, password: String) {
         viewModelScope.launch {
             try {
-                val response = ApiClient.api.login(LoginRequest(email, password))
+                val response = ApiClient.api.login(LoginRequest(email.trim(), password))
                 tokenStore.save(response.token)
                 loggedIn = true
-                message = "Connecté : ${response.user.name}"
+                message = ""
             } catch (e: Exception) {
                 message = "Échec de la connexion : ${e.message}"
             }
         }
+    }
+
+    fun logout() {
+        tokenStore.clear()
+        loggedIn = false
+        message = ""
     }
 }
