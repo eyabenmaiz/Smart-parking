@@ -14,3 +14,24 @@ data class ParkingResponse(
     val capacity: Int,
     val availableSpots: Int
 )
+data class SpotResponse(
+    val id: Long,
+    val number: String,
+    val available: Boolean
+)
+
+data class ReservationRequest(
+    val spotId: Long,
+    val startTime: String,
+    val endTime: String
+)
+
+data class ReservationResponse(
+    val id: Long,
+    val spotId: Long,
+    val spotNumber: String,
+    val parkingName: String,
+    val startTime: String,
+    val endTime: String,
+    val status: String
+)

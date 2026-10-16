@@ -1,5 +1,8 @@
 package com.example.smartparking.userinterface
 
+
+
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +26,7 @@ import androidx.compose.ui.unit.dp
 fun ParkingsScreen(
     viewModel: ParkingsViewModel,
     onLogout: () -> Unit,
+    onParkingClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(Unit) { viewModel.load() }
@@ -42,7 +46,11 @@ fun ParkingsScreen(
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(viewModel.parkings) { parking ->
-                Card(modifier = Modifier.fillMaxWidth()) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onParkingClick(parking.id) }
+                ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(parking.name, style = MaterialTheme.typography.titleMedium)
                         Text(parking.address)
